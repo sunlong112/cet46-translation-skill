@@ -70,5 +70,37 @@
     "expect_pass": true,
     "expect_band": "10-12",
     "expect_codes": []
+  },
+  {
+    "name": "case10_passive_present",
+    "source": "这座博物馆位于北京。它每天开放。",
+    "target": "The museum is located in Beijing. It opens every day.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
+  },
+  {
+    "name": "case11_tense_markers_per_switch",
+    "source": "他去年去了北京。他现在住在上海。他上个月去了很多地方。",
+    "target": "He went to Beijing last year. He lives in Shanghai now. He visited many places last month.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
+  },
+  {
+    "name": "case12_drop_one_sentence_info",
+    "source": "中国有很多传统节日。春节是最重要的一个。人们会回家与家人团聚。孩子们会收到红包。",
+    "target": "China has many traditional festivals. The Spring Festival is the most important one. People go home and stay with their families.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": ["sentence_drop"]
+  },
+  {
+    "name": "case13_cet4_words_no_band_drop",
+    "source": "我们应该评估这个方案，并改进现有系统。",
+    "target": "We should evaluate the plan and improve the current system.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
   }
 ]

@@ -5,7 +5,7 @@ description: Translate Chinese exam passages into simple, accurate English for C
 
 # 四六级翻译（简单词汇版）
 
-把中文段落译成**只用基础词汇、语义完整**的英文，稳定落在六级翻译 10–12 分档。
+把中文段落译成**只用基础词汇、语义完整**的英文，目标六级翻译 10–12 分档。脚本只筛查表层错误，分档与语义完整性必须人工判断。
 
 ## 适用与边界
 
@@ -19,6 +19,7 @@ description: Translate Chinese exam passages into simple, accurate English for C
 3. **句式降级**：以简单句为主；一句最多一个从句；禁止倒装、虚拟语气、独立主格、插入语。
 4. **不增不删**：不加原文没有的评价、背景或议论性连接。
 5. **长度控制**：单句 ≤ 20 词，平均句长 12–18 词。
+6. **不向脚本妥协**：脚本命中的表达若本身正确（works of art、a US company、being used），保留原文并记为误报，不得为了消除告警改写正确表达。
 
 ## 执行流程
 
@@ -43,19 +44,26 @@ description: Translate Chinese exam passages into simple, accurate English for C
 
 ### 5. 回填核对
 
-逐条比对信息点清单与译文：顺序可调，**一个都不能少**；数字、人名、地名、年代必须对上。
+逐条比对信息点清单与译文：顺序可调，**一个都不能少**；数字、人名、地名、年代必须对上。这一步只能人工做：脚本的 `sentence_drop` 是弱提示，整句漏译同样可能漏检。
 
 ### 6. 语法自检
 
 主谓一致、单复数、冠词、时态统一、拼写。中文标点必须清干净。
 
-### 7. 机器自检
+### 7. 机器筛查（不是评分）
 
 ```bash
 python scripts/check_translation.py --source 原文.txt --target 译文.txt
 ```
 
-输出 `score` / `band` / `issues`。出现 critical 必须改到 0 再交付；band 不是 10–12 就继续降级词汇。
+脚本只查可机械判断的表层问题：中文标点、主谓一致、there be、冠词、数字缺失、句数骤减、句间时态反复切换。它**不能**判断语义是否完整、搭配是否地道、是否真达 10–12 分档。
+
+处理规则：
+
+- `critical` 逐条人工判断：真错就改；表达本身正确（works of art、a US company）就保留，并在核对表记「误报，保留」。
+- `warning` 是线索不是命令，先回原文再决定是否改。
+- `band` 是筛查值，不是分数。不要因为它显示 7–9 就无差别简化；只有 `advanced_hits` 中确属超纲、且能等价替换的词才换。
+- 脚本报「未发现可机械判断的错误」，只代表没有表层硬错，不代表译文合格。
 
 ### 8. 输出格式
 
@@ -66,9 +74,12 @@ python scripts/check_translation.py --source 原文.txt --target 译文.txt
 【信息点核对】
 - 信息点 1 → 对应译文片段 ✓
 - 信息点 2 → ……
+- 脚本误报 1 → 原文片段（保留不改）
 
-【自评】六级 10–12 分档｜替换难词 X 处｜最长句 Y 词
+【自评】难词 X 处｜最长句 Y 词｜critical Z｜warning W｜机器筛查 band
 ```
+
+自评行直接粘贴脚本输出的 `self_eval_line`，不要手数。
 
 ## 高频扣分点
 
@@ -78,12 +89,12 @@ python scripts/check_translation.py --source 原文.txt --target 译文.txt
 - 专有名词漏译或乱译
 - 数字、人名、年代丢失
 - although 与 but、because 与 so 同时出现
-- 一篇里三种时态混用
+- 一篇里三种时态混用（脚本 `tense_shift` 只覆盖句间切换，句内混用仍需人工看）
 
 ## 参考文件
 
 - `references/scoring-guide.md` — 评分档位与 10–12 分档特征
 - `references/word-swap.md` — 难词 → 基础词替换表
 - `references/sentence-patterns.md` — 中文常见句式转换模板
-- `scripts/check_translation.py` — 译文自检脚本
-- `assets/test-cases.json` — 三条样例题与参考译文
+- `scripts/check_translation.py` — 表层筛查脚本（非评分器）
+- `assets/test-cases.json` — 样例题与回归用例

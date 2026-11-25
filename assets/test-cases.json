@@ -43,16 +43,16 @@
     "name": "case6_tense_shift",
     "source": "他去了北京。他住在上海。他去过很多地方。",
     "target": "He went to Beijing. He lives in Shanghai. He visited many places.",
-    "expect_pass": true,
-    "expect_band": "10-12",
+    "expect_pass": false,
+    "expect_band": "需复核",
     "expect_codes": ["tense_shift"]
   },
   {
     "name": "case7_sentence_drop",
     "source": "中国有很多传统节日。春节是最重要的一个。人们会回家与家人团聚。孩子们会收到红包。",
     "target": "China has many traditional festivals. The Spring Festival is the most important one.",
-    "expect_pass": true,
-    "expect_band": "10-12",
+    "expect_pass": false,
+    "expect_band": "需复核",
     "expect_codes": ["sentence_drop"]
   },
   {

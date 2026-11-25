@@ -73,6 +73,17 @@ undertake unique utilize valid vary verify viable vital vulnerable whereas wides
 yield
 '''.split())
 
+# 四级核心词：不算超纲，命中也不该影响分档
+CET4_CORE = {
+    'assess', 'beneficial', 'decline', 'demonstrate', 'emerge', 'emphasize',
+    'evaluate', 'evident', 'evolve', 'expand', 'expose', 'extend', 'generate',
+    'guarantee', 'highlight', 'identify', 'indicate', 'interpret', 'maintain',
+    'participate', 'potential', 'predict', 'proceed', 'promote', 'pursue',
+    'reveal', 'secure', 'strategy', 'unique', 'valid', 'vary', 'verify', 'vital',
+}
+
+ADVANCED = ADVANCED - CET4_CORE
+
 SINGULAR_VERBS = {'is', 'was', 'has', 'does', 'goes'}
 
 BASE_VERBS = {
@@ -170,12 +181,21 @@ def sentence_tense(sentence):
     if not low:
         return 'unknown'
     for a, b in zip(low, low[1:]):
-        if a in {'has', 'have'} and b.endswith('ed'):
+        if a in {'has', 'have'} and (b.endswith('ed') or b in IRREGULAR_PARTICIPLES):
             return 'perfect'
+    # be + 过去分词是被动，时态由 be 决定，不能把 located/called/closed 判成过去时
+    for a, b in zip(low, low[1:]):
+        if a in {'is', 'are'} and (b.endswith('ed') or b in IRREGULAR_PARTICIPLES):
+            return 'present'
+        if a in {'was', 'were'} and (b.endswith('ed') or b in IRREGULAR_PARTICIPLES):
+            return 'past'
     if any(w in IRREGULAR_PAST for w in low):
         return 'past'
-    if any(w.endswith('ed') and len(w) > 3 for w in low):
-        return 'past'
+    for i, w in enumerate(low):
+        if w.endswith('ed') and len(w) > 3:
+            prev = low[i - 1] if i > 0 else ''
+            if prev not in {'is', 'are', 'was', 'were', 'be', 'been', 'being', 'has', 'have', 'had'}:
+                return 'past'
     for a, b in zip(low, low[1:]):
         if a in {'he', 'she', 'it', 'they', 'we', 'i', 'people'}:
             if b in BASE_VERBS or (b.endswith('s') and len(b) > 3 and not b.endswith('ss')):
@@ -183,6 +203,13 @@ def sentence_tense(sentence):
     if any(w in {'is', 'are', 'do', 'does'} for w in low):
         return 'present'
     return 'unknown'
+
+
+def has_time_marker(sentence):
+    low = [t.lower() for t in tokenize(sentence)]
+    if any(w in TIME_MARKERS for w in low):
+        return True
+    return bool(re.findall('[0-9]{4}', sentence))
 
 
 def analyze(source, target):
@@ -299,11 +326,17 @@ def analyze(source, target):
 
     # 句数骤减：比字符比值更能发现整句漏译，但仍需人工确认
     src_sentences = count_source_sentences(source)
-    if src_sentences >= 2 and len(sentences) < src_sentences * 0.6:
+    if src_sentences >= 2 and len(sentences) < src_sentences * 0.75:
         issues.append(issue(
             'warning', 'sentence_drop',
-            '原文 {} 句，译文仅 {} 句，疑似整句漏译或过度合并，请逐条核对信息点'.format(
+            '原文 {} 句，译文仅 {} 句，疑似整句漏译，请逐条核对信息点'.format(
                 src_sentences, len(sentences)),
+        ))
+    elif src_sentences >= 2 and len(sentences) < src_sentences:
+        issues.append(issue(
+            'info', 'sentence_drop',
+            '译文句数少于原文（{}/{}），确认是合并还是漏译'.format(
+                len(sentences), src_sentences),
         ))
 
     src_chars = len(''.join(
@@ -312,15 +345,20 @@ def analyze(source, target):
     ))
     coverage = round(word_count / max(src_chars, 1), 3)
 
-    # 时态：句间反复切换且无时间标记时提示
+    # 时态：逐个切换点判断，只有该切换缺少时间状语才算无理由
     tenses = [sentence_tense(s) for s in sentences]
-    known = [t for t in tenses if t != 'unknown']
-    switches = sum(1 for a, b in zip(known, known[1:]) if a != b)
-    has_marker = any(w in TIME_MARKERS for w in lower) or bool(re.findall('[0-9]{4}', target))
-    if switches >= 2 and not has_marker:
+    unjustified = 0
+    for i in range(1, len(tenses)):
+        if tenses[i] == 'unknown' or tenses[i - 1] == 'unknown':
+            continue
+        if tenses[i] == tenses[i - 1]:
+            continue
+        if not (has_time_marker(sentences[i]) or has_time_marker(sentences[i - 1])):
+            unjustified += 1
+    if unjustified >= 1:
         issues.append(issue(
             'warning', 'tense_shift',
-            '句间时态切换 {} 次且无时间状语，请确认时间线是否统一'.format(switches),
+            '有 {} 处句间时态切换缺少时间状语，请确认时间线'.format(unjustified),
         ))
 
     critical = sum(1 for i in issues if i['level'] == 'critical')
@@ -328,9 +366,9 @@ def analyze(source, target):
     info = sum(1 for i in issues if i['level'] == 'info')
     score = max(0, min(100, 100 - 12 * critical - 4 * warning - 1 * info))
 
-    if critical or warning >= 5:
+    if critical or warning >= 3:
         band = '需复核'
-    elif len(advanced_hits) <= 2 and max_len <= 28 and avg_len <= 20:
+    elif max_len <= 25 and avg_len <= 18:
         band = '10-12（筛查值）'
     else:
         band = '7-9（筛查值）'
@@ -343,7 +381,7 @@ def analyze(source, target):
     return {
         'score': score,
         'band': band,
-        'pass': critical == 0 and score >= 80,
+        'pass': critical == 0 and warning < 3 and score >= 80,
         'pass_note': 'pass 仅表示表层筛查未发现硬错误，不代表语义完整或达到 10-12 分档',
         'metrics': {
             'sentences': len(sentences),
@@ -357,7 +395,7 @@ def analyze(source, target):
             'passive_voice': passive,
             'relative_clauses': clauses,
             'coverage_ratio': coverage,
-            'tense_switches': switches,
+            'tense_switches': unjustified,
         },
         'issues': issues,
         'self_eval_line': self_eval,

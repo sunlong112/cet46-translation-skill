@@ -102,5 +102,13 @@
     "expect_pass": true,
     "expect_band": "10-12",
     "expect_codes": []
+  },
+  {
+    "name": "case14_perfect_plus_present_no_warning",
+    "source": "中国人素来恪守礼尚往来的传统。收到礼物时，他们会向对方表示感谢。",
+    "target": "Chinese people have followed the tradition of give and take for a long time. They say thank you when they receive a gift.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
   }
 ]

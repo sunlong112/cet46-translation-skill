@@ -1,0 +1,30 @@
+[
+  {
+    "name": "case1_tea_culture",
+    "source": "中国的茶文化历史悠久。早在几千年前，中国人就开始种植茶树并饮用茶水。如今，茶已经成为中国人日常生活中不可缺少的一部分。",
+    "target": "China has a long history of tea culture. Thousands of years ago, Chinese people began to grow tea plants and drink tea. Today, tea has become an important part of Chinese people's daily life.",
+    "expect_pass": true,
+    "expect_band": "10-12"
+  },
+  {
+    "name": "case2_urbanization",
+    "source": "随着城市化进程的不断加快，越来越多的人涌入大城市寻找工作机会。然而，随之而来的交通拥堵和住房紧张等问题也日益突出。",
+    "target": "As cities grow faster and faster, more and more people move to big cities to look for jobs. However, problems such as heavy traffic and a shortage of housing are also becoming more serious.",
+    "expect_pass": true,
+    "expect_band": "10-12"
+  },
+  {
+    "name": "case3_paper_cutting",
+    "source": "剪纸是中国最古老的民间艺术之一。人们用剪刀在红纸上剪出各种图案，表达对美好生活的向往。",
+    "target": "Paper cutting is one of the oldest folk arts in China. People use scissors to cut different patterns on red paper. In this way, they show their hope for a better life.",
+    "expect_pass": true,
+    "expect_band": "10-12"
+  },
+  {
+    "name": "case4_bad_example",
+    "source": "元宵节在农历正月十五，人们会吃元宵、看花灯，热闹非凡。",
+    "target": "The Lantern Festival is on the 15th day of the first lunar month，people eat yuanxiao and watch lanterns. Although it is very cold, but people are still very happy. There have many people on the street, and they is excited.",
+    "expect_pass": false,
+    "expect_band": "7-9"
+  }
+]

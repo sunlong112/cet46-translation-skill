@@ -4,27 +4,71 @@
     "source": "中国的茶文化历史悠久。早在几千年前，中国人就开始种植茶树并饮用茶水。如今，茶已经成为中国人日常生活中不可缺少的一部分。",
     "target": "China has a long history of tea culture. Thousands of years ago, Chinese people began to grow tea plants and drink tea. Today, tea has become an important part of Chinese people's daily life.",
     "expect_pass": true,
-    "expect_band": "10-12"
+    "expect_band": "10-12",
+    "expect_codes": []
   },
   {
     "name": "case2_urbanization",
     "source": "随着城市化进程的不断加快，越来越多的人涌入大城市寻找工作机会。然而，随之而来的交通拥堵和住房紧张等问题也日益突出。",
     "target": "As cities grow faster and faster, more and more people move to big cities to look for jobs. However, problems such as heavy traffic and a shortage of housing are also becoming more serious.",
     "expect_pass": true,
-    "expect_band": "10-12"
+    "expect_band": "10-12",
+    "expect_codes": []
   },
   {
     "name": "case3_paper_cutting",
     "source": "剪纸是中国最古老的民间艺术之一。人们用剪刀在红纸上剪出各种图案，表达对美好生活的向往。",
     "target": "Paper cutting is one of the oldest folk arts in China. People use scissors to cut different patterns on red paper. In this way, they show their hope for a better life.",
     "expect_pass": true,
-    "expect_band": "10-12"
+    "expect_band": "10-12",
+    "expect_codes": []
   },
   {
     "name": "case4_bad_example",
     "source": "元宵节在农历正月十五，人们会吃元宵、看花灯，热闹非凡。",
     "target": "The Lantern Festival is on the 15th day of the first lunar month，people eat yuanxiao and watch lanterns. Although it is very cold, but people are still very happy. There have many people on the street, and they is excited.",
     "expect_pass": false,
-    "expect_band": "7-9"
+    "expect_band": "需复核",
+    "expect_codes": ["sv", "there", "cn_punct", "although_but"]
+  },
+  {
+    "name": "case5_works_of_art_regression",
+    "source": "这家博物馆收藏了许多来自中国的艺术品。参观者可以免费进入。",
+    "target": "The museum has many works of art from China. Visitors can enter for free.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
+  },
+  {
+    "name": "case6_tense_shift",
+    "source": "他去了北京。他住在上海。他去过很多地方。",
+    "target": "He went to Beijing. He lives in Shanghai. He visited many places.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": ["tense_shift"]
+  },
+  {
+    "name": "case7_sentence_drop",
+    "source": "中国有很多传统节日。春节是最重要的一个。人们会回家与家人团聚。孩子们会收到红包。",
+    "target": "China has many traditional festivals. The Spring Festival is the most important one.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": ["sentence_drop"]
+  },
+  {
+    "name": "case8_acronym_article",
+    "source": "他在一家美国公司工作。",
+    "target": "He works for a US company.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
+  },
+  {
+    "name": "case9_being_used_no_false_positive",
+    "source": "这种方法正在许多学校使用。",
+    "target": "This method is being used in many schools.",
+    "expect_pass": true,
+    "expect_band": "10-12",
+    "expect_codes": []
   }
 ]

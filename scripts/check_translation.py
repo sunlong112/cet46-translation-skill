@@ -205,6 +205,14 @@ def sentence_tense(sentence):
     return 'unknown'
 
 
+def tense_family(tense):
+    if tense == 'past':
+        return 'past'
+    if tense in {'present', 'perfect'}:
+        return 'nonpast'
+    return 'unknown'
+
+
 def has_time_marker(sentence):
     low = [t.lower() for t in tokenize(sentence)]
     if any(w in TIME_MARKERS for w in low):
@@ -345,13 +353,13 @@ def analyze(source, target):
     ))
     coverage = round(word_count / max(src_chars, 1), 3)
 
-    # 时态：逐个切换点判断，只有该切换缺少时间状语才算无理由
+    # 时态：现在时与现在完成时同属“非过去”，只有 past 与非过去之间的切换才算
     tenses = [sentence_tense(s) for s in sentences]
     unjustified = 0
     for i in range(1, len(tenses)):
-        if tenses[i] == 'unknown' or tenses[i - 1] == 'unknown':
-            continue
-        if tenses[i] == tenses[i - 1]:
+        fam_a = tense_family(tenses[i - 1])
+        fam_b = tense_family(tenses[i])
+        if fam_a == 'unknown' or fam_b == 'unknown' or fam_a == fam_b:
             continue
         if not (has_time_marker(sentences[i]) or has_time_marker(sentences[i - 1])):
             unjustified += 1

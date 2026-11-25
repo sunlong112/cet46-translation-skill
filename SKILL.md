@@ -18,7 +18,7 @@ description: Translate Chinese exam passages into simple, accurate English for C
 2. **词汇降级**：主动避开六级难词，替换表见 `references/word-swap.md`。
 3. **句式降级**：以简单句为主；一句最多一个从句；禁止倒装、虚拟语气、独立主格、插入语。
 4. **不增不删**：不加原文没有的评价、背景或议论性连接。
-5. **长度控制**：单句 ≤ 20 词，平均句长 12–18 词。
+5. **长度控制**：单句 ≤ 20 词，平均 8–18 词。
 6. **不向脚本妥协**：脚本命中的表达若本身正确（works of art、a US company、being used），保留原文并记为误报，不得为了消除告警改写正确表达。
 
 ## 执行流程

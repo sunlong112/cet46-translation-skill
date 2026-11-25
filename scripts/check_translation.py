@@ -366,7 +366,7 @@ def analyze(source, target):
     info = sum(1 for i in issues if i['level'] == 'info')
     score = max(0, min(100, 100 - 12 * critical - 4 * warning - 1 * info))
 
-    if critical or warning >= 3:
+    if critical or warning >= 1:
         band = '需复核'
     elif max_len <= 25 and avg_len <= 18:
         band = '10-12（筛查值）'
@@ -381,7 +381,7 @@ def analyze(source, target):
     return {
         'score': score,
         'band': band,
-        'pass': critical == 0 and warning < 3 and score >= 80,
+        'pass': critical == 0 and warning == 0 and score >= 80,
         'pass_note': 'pass 仅表示表层筛查未发现硬错误，不代表语义完整或达到 10-12 分档',
         'metrics': {
             'sentences': len(sentences),
